@@ -1,0 +1,25 @@
+{
+  "namespace": "com.letrogthien.common.event",
+  "type": "record",
+  "name": "StrangeDevice",
+  "fields": [
+    {
+      "name": "deviceType",
+      "type": {
+        "type": "string"
+      }
+    },
+    {
+      "name": "deviceName",
+      "type": {
+        "type": "string"
+      }
+    },
+    {
+      "name": "email",
+      "type": {
+        "type": "string"
+      }
+    }
+  ]
+}

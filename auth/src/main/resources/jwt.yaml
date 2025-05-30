@@ -1,0 +1,18 @@
+security:
+  secret:
+    tokens:
+      access_token:
+        secret: VhxgkvnS2x4wHHS4XKzUTTlG0IdlTydjtOn+qAitgHE=
+        expiration: 3600000
+      refresh_token:
+        secret: VhxgkvnS2x4wHHS4XKzUTTlG0IdlTydjtOn+qAitgHE=
+        expiration: 604800000
+      tmp_token:
+        secret: KubnkvnS2x4wHHS4XKzUTTlG0IdlTydjtOn+qAitgHE=
+        expiration: 300000
+      activation_token:
+        secret: VhxgkvnS2x4wHHS4XKzUTTlG0IdlTydjtOn+qAitgHE=
+        expiration: 86400000
+      password_reset_token:
+        secret: VhxgkvnS2x4wHHS4XKzUTTlG0IdlTydjtOn+qAitgHE=
+        expiration: 3600000

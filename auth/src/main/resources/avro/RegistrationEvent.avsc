@@ -1,0 +1,17 @@
+{
+  "namespace": "com.letrogthien.common.event",
+  "type": "record",
+  "name": "RegistrationEvent",
+  "fields": [
+    {
+      "name": "email",
+      "type": "string"
+    },
+    {
+      "name": "urlActivation",
+      "type": {
+        "type": "string"
+      }
+    }
+  ]
+}

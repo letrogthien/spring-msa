@@ -1,0 +1,17 @@
+{
+  "namespace": "com.letrogthien.common.event",
+  "type": "record",
+  "name": "OtpEvent",
+  "fields": [
+    {
+      "name": "email",
+      "type": "string"
+    },
+    {
+      "name": "otp",
+      "type": {
+        "type": "string"
+      }
+    }
+  ]
+}
