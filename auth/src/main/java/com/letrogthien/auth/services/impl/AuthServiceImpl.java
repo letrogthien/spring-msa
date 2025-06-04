@@ -59,6 +59,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final DeviceInformationRepository deviceInformationRepository;
 
+
     @Override
     public ApiResponse<String> register(RegisterRequest registerRequest) {
         String responseData = "";
@@ -383,8 +384,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ApiResponse<String> trustDevice(String deviceName, String deviceType, UUID userId) {
-
-        return null;
+        User user = this.userRepository.findById(userId).orElseThrow(() ->
+                new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        DeviceInformation deviceInformation = new DeviceInformation();
+        deviceInformation.setUserId(user.getId());
+        deviceInformation.setDeviceName(deviceName);
+        deviceInformation.setDeviceType(deviceType);
+        deviceInformation.setLastLoginAt(ZonedDateTime.now());
+        deviceInformation.setCreatedAt(ZonedDateTime.now());
+        this.deviceInformationRepository.save(deviceInformation);
+        return ApiResponse.<String>builder()
+                .message("Device trusted successfully")
+                .data("Device trusted successfully")
+                .build();
     }
 
     @Override
@@ -410,8 +423,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApiResponse<String> resetPassword(ResetPwdRequest resetPwdRequest) {
-        return null;
+    public ApiResponse<String> resetPassword(ResetPwdRequest resetPwdRequest, String token) {
+        if (!this.jwtUtils.isTokenValid(token, TokenType.PASSWORD_RESET_TOKEN)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+        UUID userId = UUID.fromString(this.jwtUtils.extractClaim(token, "id"));
+        User user = this.userRepository.findById(userId).orElseThrow(() ->
+                new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        String newPassword = resetPwdRequest.getNewPassword();
+        String confirmPassword = resetPwdRequest.getConfirmPassword();
+        if (!newPassword.equals(confirmPassword)) {
+            throw new CustomException(ErrorCode.PASSWORDS_DO_NOT_MATCH);
+        }
+        user.setPasswordHash(this.passwordEncoder.passwordEncoder().encode(newPassword));
+        this.userRepository.save(user);
+        return ApiResponse.<String>builder()
+                .message("Password reset successfully")
+                .data("Password reset successfully")
+                .build();
     }
 
 }

@@ -6,6 +6,6 @@ public enum TokenType {
     ONE_TIME_TOKEN,
     ACTIVATION_TOKEN,
     TMP_TOKEN,
-    PASSWORD_RESET_TOKEN;
+    PASSWORD_RESET_TOKEN
 
 }

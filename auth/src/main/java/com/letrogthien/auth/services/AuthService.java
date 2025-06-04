@@ -31,5 +31,5 @@ public interface AuthService {
 
     ApiResponse<String> activateAccount(String token);
 
-    ApiResponse<String> resetPassword(ResetPwdRequest resetPwdRequest);
+    ApiResponse<String> resetPassword(ResetPwdRequest resetPwdRequest, String token);
 }

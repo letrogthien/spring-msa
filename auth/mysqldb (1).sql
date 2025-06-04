@@ -76,27 +76,6 @@ UNLOCK TABLES;
 -- Table structure for table `kyc_documents`
 --
 
-DROP TABLE IF EXISTS `kyc_documents`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `kyc_documents` (
-  `id` binary(16) NOT NULL DEFAULT (uuid_to_bin(uuid())),
-  `user_id` binary(16) NOT NULL,
-  `document_type` varchar(50) NOT NULL,
-  `document_number` varchar(50) NOT NULL,
-  `front_image_url` varchar(255) NOT NULL,
-  `back_image_url` varchar(255) DEFAULT NULL,
-  `status` tinyint NOT NULL,
-  `submitted_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `reviewed_at` timestamp NULL DEFAULT NULL,
-  `reviewer_id` binary(16) DEFAULT NULL,
-  `version` int DEFAULT '1',
-  PRIMARY KEY (`id`),
-  KEY `reviewer_id` (`reviewer_id`),
-  KEY `idx_kyc_documents_user_id` (`user_id`),
-  CONSTRAINT `kyc_documents_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `kyc_documents_ibfk_2` FOREIGN KEY (`reviewer_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -248,6 +227,9 @@ CREATE TABLE `users` (
   KEY `idx_users_email` (`email`),
   KEY `idx_users_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

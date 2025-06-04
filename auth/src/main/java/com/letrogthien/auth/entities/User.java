@@ -1,20 +1,7 @@
 package com.letrogthien.auth.entities;
 
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -61,6 +48,7 @@ public class User {
             length = 255
     )
     private String passwordHash;
+    @Enumerated(EnumType.STRING)
     @Column(
             name = "status",
             nullable = false,
@@ -98,12 +86,6 @@ public class User {
             )
     )
     private List<Role> roles = new ArrayList<>();
-    @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<KycDocument> kycDocuments = new ArrayList<>();
     @OneToMany(
             mappedBy = "user",
             cascade = {CascadeType.ALL},

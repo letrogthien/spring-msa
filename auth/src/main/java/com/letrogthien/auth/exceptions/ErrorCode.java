@@ -34,7 +34,9 @@ public enum ErrorCode {
     NOT_FOUND("AUTH_024", "Resource not found", HttpStatus.NOT_FOUND),
     PASSWORD_MISMATCH("AUTH_025", "password mismatch", HttpStatus.BAD_REQUEST),
     PASSWORD_RECENTLY_USED("AUTH_026", "password recently used", HttpStatus.BAD_REQUEST),
-    INVALID_INPUT("AUTH_027", "Invalid input", HttpStatus.BAD_REQUEST);
+    INVALID_INPUT("AUTH_027", "Invalid input", HttpStatus.BAD_REQUEST),
+    INTERNAL_SERVER_ERROR("AUTH_028", "server error",HttpStatus.INTERNAL_SERVER_ERROR ),
+    KYC_ALREADY_APPROVED("AUTH_029", "current kyc available", HttpStatus.BAD_REQUEST );
 
     private final String code;
     private final String message;

@@ -66,8 +66,8 @@ public class AuthController {
     }
 
     @PostMapping({"/reset-password"})
-    public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPwdRequest resetPwdRequest) {
-        return this.authService.resetPassword(resetPwdRequest);
+    public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPwdRequest resetPwdRequest, @RequestParam String token) {
+        return this.authService.resetPassword(resetPwdRequest, token);
     }
 
     @PostMapping({"/enable-2fa"})

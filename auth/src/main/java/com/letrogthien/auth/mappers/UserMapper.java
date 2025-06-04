@@ -3,7 +3,6 @@ package com.letrogthien.auth.mappers;
 import com.letrogthien.auth.common.RoleName;
 import com.letrogthien.auth.common.Status;
 import com.letrogthien.auth.dtos.UserDto;
-import com.letrogthien.auth.entities.KycDocument;
 import com.letrogthien.auth.entities.Role;
 import com.letrogthien.auth.entities.User;
 import org.mapstruct.Mapper;
