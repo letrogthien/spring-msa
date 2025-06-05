@@ -107,8 +107,13 @@ public class AuthServiceImpl implements AuthService {
 
     private RegistrationEvent generateRegistrationEvent(User user) {
         String var10000 = ConstString.DOMAIN_NAME.getValue();
+
         String url = var10000 + "activate?token=" + this.jwtUtils.generateActivationToken(user);
-        return RegistrationEvent.newBuilder().setEmail(user.getEmail()).setUrlActivation(url).build();
+        return RegistrationEvent.newBuilder()
+                .setEmail(user.getEmail())
+                .setUrlActivation(url)
+                .setUserId(user.getId())
+                .build();
     }
 
     @Override

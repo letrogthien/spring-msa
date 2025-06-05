@@ -12,6 +12,13 @@
       "type": {
         "type": "string"
       }
+    },
+    {
+      "name": "userId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
     }
   ]
 }

@@ -60,6 +60,10 @@ public class User {
     )
     private boolean twoFactorEnabled = false;
     @Column(
+            name = "is_kyc"
+    )
+    private boolean kyc = false;
+    @Column(
             name = "created_at",
             nullable = false
     )
@@ -92,12 +96,6 @@ public class User {
             orphanRemoval = true
     )
     private List<LoginHistory> loginHistories = new ArrayList<>();
-    @OneToMany(
-            mappedBy = "user",
-            cascade = {CascadeType.ALL},
-            orphanRemoval = true
-    )
-    private List<AuditLog> auditLogs;
 
     @PreUpdate
     private void onUpdate() {
@@ -111,6 +109,7 @@ public class User {
         this.lastLoginAt = ZonedDateTime.now();
         this.status = Status.PENDING;
         this.twoFactorEnabled = false;
+        this.kyc = false;
     }
 
     public void updateLastLogin() {

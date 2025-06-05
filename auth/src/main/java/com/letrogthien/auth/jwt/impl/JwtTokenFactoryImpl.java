@@ -35,14 +35,8 @@ public class JwtTokenFactoryImpl implements JwtTokenFactory {
         extraClaims.put("email", user.getEmail());
         extraClaims.put("status", user.getStatus());
         extraClaims.put("type", tokenType.toString());
-        System.out.println(extraClaims);
-        if (user.getKycDocuments() != null) {
-            user.getKycDocuments().stream().max((doc1, doc2) ->
-                    doc2.getSubmittedAt().compareTo(doc1.getSubmittedAt())
-            ).ifPresent(latestKycDocument ->
-                    extraClaims.put("kycStatus", latestKycDocument.getStatus())
-            );
-        }
+        extraClaims.put("kycStatus", user.isKyc());
+
 
         SecretKey key = this.getSecretKey(tokenType);
         long expiration = this.getExpiration(tokenType);
