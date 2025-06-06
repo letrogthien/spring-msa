@@ -1,5 +1,6 @@
 package com.letrogthien.auth.services.impl;
 
+import com.letrogthien.auth.anotation.CusAuditable;
 import com.letrogthien.auth.common.RoleName;
 import com.letrogthien.auth.common.Status;
 import com.letrogthien.auth.entities.Role;
@@ -21,12 +22,23 @@ import java.util.UUID;
 public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+
+
+
     @Override
+    @CusAuditable(
+            action = "APPROVE_USER",
+            description = "Approving a user account"
+    )
     public ApiResponse<String> approveUser(UUID userId) {
        return null;
     }
 
     @Override
+    @CusAuditable(
+            action = "REJECT_USER",
+            description = "Rejecting a user account"
+    )
     public ApiResponse<String> rejectUser(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
@@ -44,16 +56,28 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @CusAuditable(
+            action = "SUSPEND_USER",
+            description = "Suspending a user account"
+    )
     public ApiResponse<String> suspendUser(UUID userId) {
         return null;
     }
 
     @Override
+    @CusAuditable(
+            action = "DELETE_USER",
+            description = "Deleting a user account"
+    )
     public ApiResponse<String> deleteUser(UUID userId) {
         return null;
     }
 
     @Override
+    @CusAuditable(
+            action = "SET_ROLE",
+            description = "Assigning a role to a user"
+    )
     public ApiResponse<String> setRoleForUser(UUID userId, RoleName roleName) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)

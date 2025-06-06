@@ -5,6 +5,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.letrogthien.auth.anotation.CusAuditable;
 import com.letrogthien.auth.common.ConstString;
 import com.letrogthien.auth.common.RoleName;
 import com.letrogthien.auth.common.Status;
@@ -42,6 +44,8 @@ import com.letrogthien.auth.services.AuthService;
 import com.letrogthien.common.event.OtpEvent;
 import com.letrogthien.common.event.RegistrationEvent;
 import com.letrogthien.common.event.StrangeDevice;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,7 +122,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public ApiResponse<LoginResponse> login(LoginRequest loginRequest) {
+    public ApiResponse<LoginResponse> login(LoginRequest loginRequest, HttpServletResponse response) {
         User user = this.userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
@@ -139,7 +143,7 @@ public class AuthServiceImpl implements AuthService {
         }
         user.updateLastLogin();
         this.userRepository.save(user);
-        return this.generateLoginResponse(user);
+        return this.generateLoginResponse(user, response);
 
 
     }
@@ -177,16 +181,28 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    private ApiResponse<LoginResponse> generateLoginResponse(User user) {
+    private ApiResponse<LoginResponse> generateLoginResponse(User user, HttpServletResponse response) {
         String token = this.jwtUtils.generateToken(user);
         String refreshToken = this.jwtUtils.generateRefreshToken(user);
         String jti = this.jwtUtils.extractClaim(refreshToken, "jti");
         this.whiteListCacheService.saveToCache(new WhiteList(jti, user.getId()));
+
+        Cookie cookie = new Cookie("access_jtoken", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(3600000);
+        response.addCookie(cookie);
+
+        Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(604800000);
+        response.addCookie(refreshTokenCookie);
         return ApiResponse.<LoginResponse>builder()
                 .message("Login successful")
                 .data(LoginResponse.builder()
-                        .accessToken(token)
-                        .refreshToken(refreshToken)
                         .build())
                 .build();
     }
@@ -214,7 +230,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApiResponse<LoginResponse> verifyTwoFAuth(Verify2FaRequest verify2FaRequest) {
+    public ApiResponse<LoginResponse> verifyTwoFAuth(Verify2FaRequest verify2FaRequest, HttpServletResponse response) {
         String secret = verify2FaRequest.getSecret();
         if (!this.jwtUtils.isTokenValid(secret, TokenType.TMP_TOKEN)) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
@@ -230,7 +246,7 @@ public class AuthServiceImpl implements AuthService {
         User user = this.userRepository.findById(userId).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
-        return this.generateLoginResponse(user);
+        return this.generateLoginResponse(user, response );
 
 
     }
@@ -283,10 +299,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @CusAuditable(action = "Change Password", description = "User changes their password")
     public ApiResponse<String> changePassword(ChangePwdRequest changePwdRequest, UUID userId) {
         User user = this.userRepository.findById(userId).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
+        System.out.println("User found: " + user.getUsername());
         this.validateChangePasswordRequest(changePwdRequest, user.getPasswordHash(), userId);
         String newPassword = changePwdRequest.getNewPassword();
         user.setPasswordHash(this.passwordEncoder.passwordEncoder().encode(newPassword));
@@ -363,6 +381,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
+    @CusAuditable(action = "Disable 2FA", description = "User disables two-factor authentication")
     public ApiResponse<String> disableTwoFAuth(Disable2FaRequest disable2FAuthRequest, UUID userId) {
 
         boolean isValid = otpModelCacheService.isPresentAndValidInCache(
@@ -388,6 +407,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @CusAuditable(action = "Trust Device", description = "User trusts a device for future logins")
     public ApiResponse<String> trustDevice(String deviceName, String deviceType, UUID userId) {
         User user = this.userRepository.findById(userId).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)

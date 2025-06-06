@@ -2,6 +2,7 @@ package com.letrogthien.auth.controllers;
 
 
 import com.letrogthien.auth.services.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import com.letrogthien.auth.anotation.JwtClaims;
@@ -36,8 +37,8 @@ public class AuthController {
     }
 
     @PostMapping({"/login"})
-    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        return this.authService.login(loginRequest);
+    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        return this.authService.login(loginRequest, response);
     }
 
     @PostMapping({"/logout"})
@@ -81,8 +82,8 @@ public class AuthController {
     }
 
     @PostMapping({"/verify-2fa"})
-    public ApiResponse<LoginResponse> verifyTwoFAuth(@RequestBody Verify2FaRequest verify2FaRequest) {
-        return this.authService.verifyTwoFAuth(verify2FaRequest);
+    public ApiResponse<LoginResponse> verifyTwoFAuth(@RequestBody Verify2FaRequest verify2FaRequest, HttpServletResponse response) {
+        return this.authService.verifyTwoFAuth(verify2FaRequest , response);
     }
 
     @PostMapping({"/trust-device"})

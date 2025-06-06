@@ -70,6 +70,15 @@ services:
       - schema-registry
     networks:
       - app-network
+  mongodb:
+    image: mongo:4.4
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - 27017:27017
+    volumes:
+      - db_data:/data/db
 
 networks:
   app-network:
@@ -81,4 +90,6 @@ volumes:
   mysql_data:
     driver: local
   redis_data:
+    driver: local
+  db_data:
     driver: local
