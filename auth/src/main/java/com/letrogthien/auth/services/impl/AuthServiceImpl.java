@@ -11,11 +11,7 @@ import com.letrogthien.auth.common.ConstString;
 import com.letrogthien.auth.common.RoleName;
 import com.letrogthien.auth.common.Status;
 import com.letrogthien.auth.common.TokenType;
-import com.letrogthien.auth.entities.DeviceInformation;
-import com.letrogthien.auth.entities.PasswordHistory;
-import com.letrogthien.auth.entities.Role;
-import com.letrogthien.auth.entities.User;
-import com.letrogthien.auth.entities.WhiteList;
+import com.letrogthien.auth.entities.*;
 import com.letrogthien.auth.exceptions.CustomException;
 import com.letrogthien.auth.exceptions.ErrorCode;
 import com.letrogthien.auth.jwt.JwtUtils;
@@ -24,10 +20,7 @@ import com.letrogthien.auth.otp.OtpModel;
 import com.letrogthien.auth.otp.OtpType;
 import com.letrogthien.auth.redis.services.OtpModelCacheService;
 import com.letrogthien.auth.redis.services.WhiteListCacheService;
-import com.letrogthien.auth.repositories.DeviceInformationRepository;
-import com.letrogthien.auth.repositories.PasswordHistoryRepository;
-import com.letrogthien.auth.repositories.RoleRepository;
-import com.letrogthien.auth.repositories.UserRepository;
+import com.letrogthien.auth.repositories.*;
 import com.letrogthien.auth.requests.AccessTokenRequest;
 import com.letrogthien.auth.requests.ChangePwdRequest;
 import com.letrogthien.auth.requests.Disable2FaRequest;
@@ -62,9 +55,11 @@ public class AuthServiceImpl implements AuthService {
     private final EventProducer eventProducer;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final DeviceInformationRepository deviceInformationRepository;
+    private final RegisterOutBoxRepository registerOutBoxRepository;
 
 
     @Override
+    @Transactional
     public ApiResponse<String> register(RegisterRequest registerRequest) {
         String responseData = "";
         if (this.existUsername(registerRequest.getUsername())) {
@@ -91,12 +86,11 @@ public class AuthServiceImpl implements AuthService {
         user.setRoles(List.of(defaultRole));
         this.userRepository.save(user);
 
-        RegistrationEvent registrationEvent = this.generateRegistrationEvent(user);
-        this.eventProducer.registerUser(registrationEvent);
+        this.generateRegistrationEventOutBox(user);
 
         return ApiResponse.<String>builder()
-                .message("Registration successful, please check your email to activate your account")
-                .data("Registration successful")
+                .message("resisting")
+                .data("Registration")
                 .build();
 
     }
@@ -109,15 +103,16 @@ public class AuthServiceImpl implements AuthService {
         return this.userRepository.existsByEmail(email);
     }
 
-    private RegistrationEvent generateRegistrationEvent(User user) {
+    private void generateRegistrationEventOutBox(User user) {
         String var10000 = ConstString.DOMAIN_NAME.getValue();
 
         String url = var10000 + "activate?token=" + this.jwtUtils.generateActivationToken(user);
-        return RegistrationEvent.newBuilder()
-                .setEmail(user.getEmail())
-                .setUrlActivation(url)
-                .setUserId(user.getId())
+        RegisterOutBox registerOutBox = RegisterOutBox.builder()
+                .email(user.getEmail())
+                .userId(user.getId())
+                .urlActivation(url)
                 .build();
+        registerOutBoxRepository.save(registerOutBox);
     }
 
     @Override

@@ -14,7 +14,9 @@ public enum Status {
     ENABLED,
     UNVERIFIED,
     VERIFIED,
-    NONE;
+    NONE,
+    SUCCESS,
+    RETRY,;
 
 
 }
