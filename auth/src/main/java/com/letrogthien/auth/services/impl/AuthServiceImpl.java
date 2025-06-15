@@ -2,6 +2,7 @@ package com.letrogthien.auth.services.impl;
 
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,7 +36,6 @@ import com.letrogthien.auth.responses.LoginResponse;
 import com.letrogthien.auth.securities.CustomPasswordEncoder;
 import com.letrogthien.auth.services.AuthService;
 import com.letrogthien.common.event.OtpEvent;
-import com.letrogthien.common.event.RegistrationEvent;
 import com.letrogthien.common.event.StrangeDevice;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
         this.generateRegistrationEventOutBox(user);
 
         return ApiResponse.<String>builder()
-                .message("resisting")
+                .message("Registration successful, please check your email to activate your account")
                 .data("Registration")
                 .build();
 
@@ -160,13 +160,7 @@ public class AuthServiceImpl implements AuthService {
         if (isTrust.get()) {
             return;
         }
-        DeviceInformation deviceInformation = new DeviceInformation();
-        deviceInformation.setUserId(user.getId());
-        deviceInformation.setDeviceName(deviceName);
-        deviceInformation.setDeviceType(deviceTpe);
-        deviceInformation.setLastLoginAt(ZonedDateTime.now());
-        deviceInformation.setCreatedAt(ZonedDateTime.now());
-        this.deviceInformationRepository.save(deviceInformation);
+        newDeviceInformation(deviceName, deviceTpe, user);
         this.eventProducer.strangeDevice(
                 StrangeDevice.newBuilder()
                         .setEmail(user.getEmail())
@@ -182,7 +176,7 @@ public class AuthServiceImpl implements AuthService {
         String jti = this.jwtUtils.extractClaim(refreshToken, "jti");
         this.whiteListCacheService.saveToCache(new WhiteList(jti, user.getId()));
 
-        Cookie cookie = new Cookie("access_jtoken", token);
+        Cookie cookie = new Cookie("access_token", token);
         cookie.setHttpOnly(true);
         cookie.setSecure(false);
         cookie.setPath("/");
@@ -407,6 +401,14 @@ public class AuthServiceImpl implements AuthService {
         User user = this.userRepository.findById(userId).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
+        newDeviceInformation(deviceName, deviceType, user);
+        return ApiResponse.<String>builder()
+                .message("Device trusted successfully")
+                .data("Device trusted successfully")
+                .build();
+    }
+
+    private void newDeviceInformation(String deviceName, String deviceType, User user) {
         DeviceInformation deviceInformation = new DeviceInformation();
         deviceInformation.setUserId(user.getId());
         deviceInformation.setDeviceName(deviceName);
@@ -414,10 +416,6 @@ public class AuthServiceImpl implements AuthService {
         deviceInformation.setLastLoginAt(ZonedDateTime.now());
         deviceInformation.setCreatedAt(ZonedDateTime.now());
         this.deviceInformationRepository.save(deviceInformation);
-        return ApiResponse.<String>builder()
-                .message("Device trusted successfully")
-                .data("Device trusted successfully")
-                .build();
     }
 
     @Override
@@ -464,4 +462,39 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    @Override
+    public ApiResponse<String> assignRoleToUser(UUID userId, RoleName roleName) {
+        return assignRoleHelper(
+                this.userRepository.findById(userId).orElseThrow(() ->
+                        new CustomException(ErrorCode.USER_NOT_FOUND)
+                ),
+                roleName
+        );
+    }
+
+    private ApiResponse<String> assignRoleHelper(User user, RoleName roleName) {
+        Role role = this.roleRepository.findByName(roleName).orElseThrow(() ->
+                new CustomException(ErrorCode.NOT_FOUND)
+        );
+        if (user.getRoles().contains(role)) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
+
+        switch (roleName) {
+            case ROLE_SELLER:
+                if (!user.isKyc()) {
+                    throw new CustomException(ErrorCode.ACCESS_DENIED);
+                }
+                break;
+
+            default:
+                break;
+        }
+        user.getRoles().add(role);
+        this.userRepository.save(user);
+        return ApiResponse.<String>builder()
+                .message("Role " + roleName + " assigned to user successfully")
+                .data("Role " + roleName + " assigned to user successfully")
+                .build();
+    }
 }

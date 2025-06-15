@@ -1,6 +1,7 @@
 package com.letrogthien.auth.services;
 
 
+import com.letrogthien.auth.common.RoleName;
 import com.letrogthien.auth.requests.*;
 import com.letrogthien.auth.responses.ApiResponse;
 import com.letrogthien.auth.responses.LoginResponse;
@@ -36,4 +37,6 @@ public interface AuthService {
     ApiResponse<String> activateAccount(String token);
 
     ApiResponse<String> resetPassword(ResetPwdRequest resetPwdRequest, String token);
+
+    ApiResponse<String> assignRoleToUser(UUID userId, RoleName roleName);
 }

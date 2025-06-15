@@ -1,6 +1,7 @@
 package com.letrogthien.auth.controllers;
 
 
+import com.letrogthien.auth.common.RoleName;
 import com.letrogthien.auth.services.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -94,6 +95,11 @@ public class AuthController {
     @PostMapping({"/activate"})
     public ApiResponse<String> activateAccount(@RequestParam String token) {
         return this.authService.activateAccount(token);
+    }
+
+    @PostMapping({"/role/assign"})
+    public ApiResponse<String> assignRoleToUser(@JwtClaims("id") UUID userId, @RequestParam RoleName roleName) {
+        return this.authService.assignRoleToUser(userId, roleName);
     }
 
 

@@ -17,6 +17,7 @@ public class Security {
     private final CustomJwtDecoder jwtDecoder;
     private final CustomAuthenticatinConverter converter;
     private final CustomAuthenticationEntryPoint entryPoint;
+    private final GetTokenResolver getTokenResolver;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
@@ -55,6 +56,7 @@ public class Security {
                         .decoder(jwtDecoder)
                         .jwtAuthenticationConverter(converter)
                 )
+                .bearerTokenResolver(getTokenResolver)
                 .authenticationEntryPoint(entryPoint)
         );
     }

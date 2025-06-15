@@ -192,6 +192,7 @@ VALUES (uuid_to_bin(uuid()), 'ROLE_USER', 'Standard user role'),
        (uuid_to_bin(uuid()), 'ROLE_DEVELOPER', 'Developer role'),
        (uuid_to_bin(uuid()), 'ROLE_TESTER', 'Tester role'),
        (uuid_to_bin(uuid()), 'ROLE_ANALYST', 'Analyst role'),
+         (uuid_to_bin(uuid()), 'ROLE_SELLER', 'Seller role'),
        (uuid_to_bin(uuid()), 'ROLE_AUDITOR', 'Auditor role');
 --
 -- Dumping data for table `roles`
