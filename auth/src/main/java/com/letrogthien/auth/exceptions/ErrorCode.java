@@ -36,7 +36,8 @@ public enum ErrorCode {
     PASSWORD_RECENTLY_USED("AUTH_026", "password recently used", HttpStatus.BAD_REQUEST),
     INVALID_INPUT("AUTH_027", "Invalid input", HttpStatus.BAD_REQUEST),
     INTERNAL_SERVER_ERROR("AUTH_028", "server error",HttpStatus.INTERNAL_SERVER_ERROR ),
-    KYC_ALREADY_APPROVED("AUTH_029", "current kyc available", HttpStatus.BAD_REQUEST );
+    KYC_ALREADY_APPROVED("AUTH_029", "current kyc available", HttpStatus.BAD_REQUEST ),
+    TOKEN_GENERATION_FAILED("AUTH_030", "generate token fail", HttpStatus.INTERNAL_SERVER_ERROR );
 
     private final String code;
     private final String message;

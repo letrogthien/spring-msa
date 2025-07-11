@@ -9,16 +9,15 @@ import java.util.List;
 import java.util.UUID;
 
 import com.letrogthien.auth.common.Status;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(
         name = "users"
 )
-@Data
+@ToString(exclude = {"roles", "loginHistories"})
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -112,7 +111,4 @@ public class User {
         this.kyc = false;
     }
 
-    public void updateLastLogin() {
-        this.lastLoginAt = ZonedDateTime.now();
-    }
 }

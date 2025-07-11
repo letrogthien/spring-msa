@@ -2,15 +2,11 @@ package com.letrogthien.auth.securities;
 
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import javax.crypto.SecretKey;
 import com.letrogthien.auth.exceptions.CustomException;
 import com.letrogthien.auth.exceptions.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -20,8 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomJwtDecoder implements JwtDecoder {
-    @Value("${security.secret.tokens.access_token.secret}")
-    private String secretKey;
+    private final RSAPublicKey publicKey;
 
     public Jwt decode(String token) throws JwtException {
         try {
@@ -40,9 +35,7 @@ public class CustomJwtDecoder implements JwtDecoder {
     }
 
     private JwtDecoder jwtDecoder() {
-        byte[] keyBytes = Decoders.BASE64.decode(this.secretKey);
-        SecretKey key = Keys.hmacShaKeyFor(keyBytes);
-        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
+        return NimbusJwtDecoder.withPublicKey(this.publicKey).build();
     }
 
     private JwtDecoder googleJwtDecoder() {

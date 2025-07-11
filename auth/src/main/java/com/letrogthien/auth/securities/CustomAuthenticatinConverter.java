@@ -3,6 +3,7 @@ package com.letrogthien.auth.securities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import com.letrogthien.auth.common.TokenType;
 import com.letrogthien.auth.entities.User;
 import com.letrogthien.auth.exceptions.CustomException;
@@ -24,12 +25,9 @@ public class CustomAuthenticatinConverter implements Converter<Jwt, AbstractAuth
     private final UserRepository userRepository;
 
     public AbstractAuthenticationToken convert(@NonNull Jwt jwt) {
-        if (jwt.getClaim("type").equals(TokenType.REFRESH_TOKEN.toString())) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
-        } else {
-            List<GrantedAuthority> roles = this.extractAuthorities(jwt);
-            return new JwtAuthenticationToken(jwt, roles);
-        }
+        List<GrantedAuthority> roles = this.extractAuthorities(jwt);
+        return new JwtAuthenticationToken(jwt, roles);
+
     }
 
     private List<GrantedAuthority> extractAuthorities(Jwt jwt) {
@@ -57,8 +55,8 @@ public class CustomAuthenticatinConverter implements Converter<Jwt, AbstractAuth
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
         roles = user.getRoles().stream()
-                    .map(role -> new SimpleGrantedAuthority(role.getName().toString()))
-                    .collect(Collectors.toList());
+                .map(role -> new SimpleGrantedAuthority(role.getName().toString()))
+                .collect(Collectors.toList());
         return roles;
     }
 }

@@ -17,17 +17,16 @@ import java.util.List;
 import java.util.UUID;
 
 import com.letrogthien.auth.common.RoleName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Entity
 @Table(
         name = "roles"
 )
-@Data
+@ToString(exclude = "users")
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

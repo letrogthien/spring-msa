@@ -6,9 +6,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @Repository
-public interface RegisterOutBoxRepository extends MongoRepository<RegisterOutBox, UUID> {
+public interface RegisterOutBoxRepository extends MongoRepository<RegisterOutBox, String> {
     List<RegisterOutBox> findAllByStatusOrderByCreatedAtAsc(Status status);
 }
