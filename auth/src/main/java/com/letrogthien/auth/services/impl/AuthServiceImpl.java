@@ -1,6 +1,7 @@
 package com.letrogthien.auth.services.impl;
 
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public ApiResponse<String> register(RegisterRequest registerRequest) {
+        System.out.println("aaaaaaaaa");
         String responseData = "";
         if (this.existUsername(registerRequest.getUsername())) {
             responseData = "Username already exists";
@@ -111,6 +113,8 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .userId(user.getId())
                 .urlActivation(url)
+                .createdAt(LocalDateTime.now())
+                .status(Status.PENDING)
                 .build();
         registerOutBoxRepository.save(registerOutBox);
     }
@@ -118,7 +122,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public ApiResponse<LoginResponse> login(LoginRequest loginRequest, HttpServletResponse response) {
-        User user = this.userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() ->
+        User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() ->
                 new CustomException(ErrorCode.USER_NOT_FOUND)
         );
         if (user.getStatus() != Status.ACTIVE) {
@@ -136,10 +140,9 @@ public class AuthServiceImpl implements AuthService {
         if (user.isTwoFactorEnabled()) {
             return this.handlerTwoFAuth(user);
         }
-        user.updateLastLogin();
-        this.userRepository.save(user);
+        user.setLastLoginAt(ZonedDateTime.now());
+        userRepository.save(user);
         return this.generateLoginResponse(user, response);
-
 
     }
 
@@ -176,7 +179,7 @@ public class AuthServiceImpl implements AuthService {
         String jti = this.jwtUtils.extractClaim(refreshToken, "jti");
         this.whiteListCacheService.saveToCache(new WhiteList(jti, user.getId()));
 
-        Cookie cookie = new Cookie("access_token", token);
+        Cookie cookie = new  Cookie("access_token", token);
         cookie.setHttpOnly(true);
         cookie.setSecure(false);
         cookie.setPath("/");

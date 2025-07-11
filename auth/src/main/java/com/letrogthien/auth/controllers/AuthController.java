@@ -19,12 +19,9 @@ import com.letrogthien.auth.requests.TrustDeviceRequest;
 import com.letrogthien.auth.requests.Verify2FaRequest;
 import com.letrogthien.auth.responses.ApiResponse;
 import com.letrogthien.auth.responses.LoginResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping({"/api/v1/auth"})
@@ -102,5 +99,16 @@ public class AuthController {
         return this.authService.assignRoleToUser(userId, roleName);
     }
 
-
+    @GetMapping({"/test"})
+    public ApiResponse<String> test() {
+        return ApiResponse.<String>builder()
+                .message("Test successful")
+                .build();
+    }
+    @GetMapping({"/test-authenticated"})
+    public ApiResponse<String> testAuthenticated(@JwtClaims("id") UUID userId) {
+        return ApiResponse.<String>builder()
+                .message("Authenticated user ID: " + userId)
+                .build();
+    }
 }

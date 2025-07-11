@@ -15,18 +15,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.util.*;
 
 @Component
 @RequiredArgsConstructor
 public class JwtTokenFactoryImpl implements JwtTokenFactory {
     private final JwtTokenConfig config;
+    private final RSAPrivateKey privateKey;
 
-    public String createToken(User user, TokenType tokenType) {
+    public String createToken(User user, TokenType tokenType)
+    {
         return this.createToken(new HashMap<>(), user, tokenType);
     }
 
-    public String createToken(Map<String, Object> extraClaims, User user, TokenType tokenType) {
+    public String createToken(Map<String, Object> extraClaims, User user, TokenType tokenType)
+    {
         List<String> authorities = this.getAuthorities(user);
         extraClaims.put("sub", user.getEmail());
         extraClaims.put("roles", authorities);
@@ -36,7 +40,16 @@ public class JwtTokenFactoryImpl implements JwtTokenFactory {
         extraClaims.put("status", user.getStatus());
         extraClaims.put("type", tokenType.toString());
         extraClaims.put("kycStatus", user.isKyc());
-
+        if (tokenType == TokenType.ACCESS_TOKEN) {
+            return Jwts.builder()
+                    .setClaims(extraClaims)
+                    .setSubject(user.getEmail())
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(System.currentTimeMillis() + this.getExpiration(tokenType)))
+                    .setHeaderParam("kid", "auth-key-001")
+                    .signWith(privateKey, SignatureAlgorithm.RS256)
+                    .compact();
+        }
 
         SecretKey key = this.getSecretKey(tokenType);
         long expiration = this.getExpiration(tokenType);
@@ -80,7 +93,7 @@ public class JwtTokenFactoryImpl implements JwtTokenFactory {
 
     private List<String> getAuthorities(User user) {
         return user.getRoles().stream().map(role ->
-                role.getName().toString()
+                role.getName().name()
         ).toList();
     }
 

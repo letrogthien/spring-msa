@@ -20,6 +20,6 @@ public class GetTokenResolver implements BearerTokenResolver {
                 }
             }
         }
-        return "";
+        return null;
     }
 }
