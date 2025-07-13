@@ -1,6 +1,7 @@
 package com.letrogthien.auth.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
@@ -92,8 +93,10 @@ public class User {
     @OneToMany(
             mappedBy = "user",
             cascade = {CascadeType.ALL},
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
+    @JsonManagedReference
     private List<LoginHistory> loginHistories = new ArrayList<>();
 
     @PreUpdate

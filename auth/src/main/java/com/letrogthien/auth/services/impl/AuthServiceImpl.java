@@ -3,7 +3,6 @@ package com.letrogthien.auth.services.impl;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -62,7 +61,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public ApiResponse<String> register(RegisterRequest registerRequest) {
-        System.out.println("aaaaaaaaa");
         String responseData = "";
         if (this.existUsername(registerRequest.getUsername())) {
             responseData = "Username already exists";
@@ -413,7 +411,7 @@ public class AuthServiceImpl implements AuthService {
 
     private void newDeviceInformation(String deviceName, String deviceType, User user) {
         DeviceInformation deviceInformation = new DeviceInformation();
-        deviceInformation.setUserId(user.getId());
+        deviceInformation.setUser(user);
         deviceInformation.setDeviceName(deviceName);
         deviceInformation.setDeviceType(deviceType);
         deviceInformation.setLastLoginAt(ZonedDateTime.now());

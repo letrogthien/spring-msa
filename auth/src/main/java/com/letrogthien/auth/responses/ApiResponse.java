@@ -4,6 +4,7 @@ package com.letrogthien.auth.responses;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
@@ -13,5 +14,8 @@ import java.time.LocalDateTime;
 public class ApiResponse<T> {
     private T data;
     private String message;
-    private LocalDateTime timestamp= LocalDateTime.now();
+    @Builder.Default
+    private LocalDateTime timestamp = LocalDateTime.now();
+    @Builder.Default
+    private HttpStatus status = HttpStatus.OK;
 }

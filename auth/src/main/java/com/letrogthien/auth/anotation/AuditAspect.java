@@ -22,14 +22,11 @@ public class AuditAspect {
 
     @Around("@annotation(com.letrogthien.auth.anotation.CusAuditable)")
     public Object logAudit(ProceedingJoinPoint joinPoint) throws Throwable {
-        System.out.println("AuditAspect.logAudit() called");
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         CusAuditable auditAnnotation = method.getAnnotation(CusAuditable.class);
-
         String action = auditAnnotation.action();
         String description = auditAnnotation.description();
-
         UUID userId = null;
         String[] parameterNames = signature.getParameterNames();
         Object[] args = joinPoint.getArgs();
@@ -39,14 +36,11 @@ public class AuditAspect {
                 break;
             }
         }
-
         AuditLog auditLog = new AuditLog();
         auditLog.setUserId(userId);
         auditLog.setAction(action);
         auditLog.setDescription(description);
-
         auditLogRepository.save(auditLog);
-
         return joinPoint.proceed();
     }
 }
